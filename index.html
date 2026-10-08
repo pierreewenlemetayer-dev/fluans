@@ -45,7 +45,7 @@ input:disabled,select:disabled,button:disabled{opacity:.5;cursor:default}
   display:grid;grid-template-columns:minmax(0,1fr) 155px;gap:18px;align-items:stretch;
 }
 .display{
-  min-height:310px;background:white;border:1px solid var(--border);border-radius:12px;
+  min-height:250px;background:white;border:1px solid var(--border);border-radius:12px;
   display:flex;align-items:center;justify-content:center;text-align:center;padding:30px;
   box-shadow:0 3px 12px rgba(30,60,80,.07);
 }
@@ -81,7 +81,7 @@ footer{text-align:center;padding:18px;color:#687681;font-size:.8rem}
 <body>
 <header>
   <h1>Fluañs</h1>
-  <p class="subtitle">améliorer sa vitesse de lecture</p>
+  <p class="subtitle">Améliorer sa vitesse de lecture</p>
 </header>
 
 <main>
@@ -111,12 +111,11 @@ footer{text-align:center;padding:18px;color:#687681;font-size:.8rem}
     </section>
 
     <aside class="side">
-      <h2>Mode d’affichage</h2>
       <div class="mode-buttons">
-        <button id="timerMode" type="button" class="mode-btn active">Timer</button>
-        <button id="manualMode" type="button" class="mode-btn">Mode manuel</button>
+        <button id="manualMode" type="button" class="mode-btn active">Mode manuel</button>
+        <button id="timerMode" type="button" class="mode-btn">Timer</button>
       </div>
-      <div class="field" id="timerSettings">
+      <div class="field" id="timerSettings" style="display:none">
         <label for="duration">Durée</label>
         <input id="duration" type="range" min="1" max="5" value="3">
         <div class="timer-value"><span id="durationValue">3</span> s</div>
@@ -145,7 +144,7 @@ const manualMode=document.getElementById("manualMode");
 const timerSettings=document.getElementById("timerSettings");
 
 let current=null, phase="ready", index=0, timerId=null, countdownId=null, chronoStart=0, chronoId=null;
-let displayMode="timer";
+let displayMode="manual";
 
 duration.addEventListener("input",()=>durationValue.textContent=duration.value);
 
@@ -193,7 +192,7 @@ function reset(){
   current=null; phase="ready"; index=0;
   message.style.fontSize="";
   message.className="";
-  message.innerHTML="Prêt·e·s ?<br>Concentré·e·s ?<br>C’est parti.";
+  message.innerHTML="";
   status.textContent="";
   action.textContent="Démarrer";
   action.classList.remove("secondary");
