@@ -215,6 +215,10 @@ function setText(text,level=null){
   message.className=level ? "level-"+level : "";
   message.textContent=text;
 }
+function seriesStatus(extra=""){
+  if(!current) return extra;
+  return "Série "+current.id+" · niveau "+current.level+(extra ? " · "+extra : "");
+}
 
 function startSeries(){
   current=chooseSeries();
@@ -234,7 +238,7 @@ function startNextPhrase(){
     phase="bonus-intro";
     setText("Bonus !");
     action.textContent="Démarrer";
-    status.textContent="Les cinq phrases sont terminées.";
+    status.textContent=seriesStatus("Les cinq phrases sont terminées.");
   }
 }
 
@@ -244,17 +248,17 @@ function runDisplay(){
 
   if(displayMode==="manual"){
     chronoStart=Date.now();
-    status.textContent="Visible depuis 0,0 s";
+    status.textContent=seriesStatus("Visible depuis 0,0 s");
     chronoId=setInterval(()=>{
       const seconds=((Date.now()-chronoStart)/1000).toFixed(1).replace(".",",");
-      status.textContent="Visible depuis "+seconds+" s";
+      status.textContent=seriesStatus("Visible depuis "+seconds+" s");
     },100);
   } else {
     let remaining=Number(duration.value);
-    status.textContent="Visible · "+remaining+" s";
+    status.textContent=seriesStatus("Visible · "+remaining+" s");
     countdownId=setInterval(()=>{
       remaining--;
-      if(remaining>0) status.textContent="Visible · "+remaining+" s";
+      if(remaining>0) status.textContent=seriesStatus("Visible · "+remaining+" s");
     },1000);
     timerId=setTimeout(()=>finishDisplay(),Number(duration.value)*1000);
   }
@@ -268,7 +272,7 @@ function finishDisplay(){
     phase="waiting-next";
     setText("Écrivez");
     action.textContent="Démarrer";
-    status.textContent=index<5 ? "Phrase "+index+" / 5 terminée." : "Les cinq phrases sont terminées.";
+    status.textContent=seriesStatus(index<5 ? "Phrase "+index+" / 5 terminée." : "Les cinq phrases sont terminées.");
     return;
   }
 
@@ -278,7 +282,7 @@ function finishDisplay(){
     setText("Correction");
     action.textContent="Correction";
     action.classList.add("secondary");
-    status.textContent="Cliquez pour révéler les phrases dans l’ordre.";
+    status.textContent=seriesStatus("Cliquez pour révéler les phrases dans l’ordre.");
   }
 }
 
@@ -291,19 +295,19 @@ function showBonus(){
 function showCorrection(){
   if(index<5){
     setText(current.phrases[index],current.level);
-    status.textContent="Correction · phrase "+(index+1)+" / 5";
+    status.textContent=seriesStatus("Correction · phrase "+(index+1)+" / 5");
     index++;
     return;
   }
   if(index===5){
     setText(current.bonus.reduced,current.level);
-    status.textContent="Correction · bonus réduit";
+    status.textContent=seriesStatus("Correction · bonus réduit");
     index++;
     return;
   }
   if(index===6){
     setText(current.bonus.full,current.level);
-    status.textContent="Correction · bonus complet";
+    status.textContent=seriesStatus("Correction · bonus complet");
     index++;
     return;
   }
@@ -311,7 +315,7 @@ function showCorrection(){
   const all=current.phrases.map((p,i)=>(i+1)+". "+p).join("\n")+"\n\nBonus : "+current.bonus.full;
   setText(all,current.level);
   message.style.fontSize="1.15rem";
-  status.textContent="Série terminée.";
+  status.textContent=seriesStatus("Série terminée.");
   action.textContent="Recommencer";
   action.classList.remove("secondary");
   phase="done";
