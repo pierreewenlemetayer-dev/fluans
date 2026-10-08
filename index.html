@@ -15,16 +15,16 @@
 *{box-sizing:border-box}
 body{
   margin:0;
-  font-family:Verdana, Geneva, sans-serif;
+  font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
   color:var(--text);
-  background:#f8fafb;
+  background:#f7f9fb;
   min-height:100vh;
   display:flex;
   flex-direction:column;
 }
-header{text-align:center;padding:28px 20px 12px}
-h1{margin:0;color:var(--blue);font-size:2.15rem;letter-spacing:.02em}
-.subtitle{margin:6px 0 0;font-size:1rem;color:#5b6b77}
+header{text-align:center;padding:42px 20px 28px}
+h1{margin:0;color:var(--blue);font-family:Georgia, "Times New Roman", serif;font-size:clamp(3rem,7vw,5rem);font-weight:700;letter-spacing:-.04em;line-height:1}
+.subtitle{margin:12px 0 0;color:#5b6b77;font-family:Georgia, "Times New Roman", serif;font-size:clamp(1.1rem,2.5vw,1.4rem);font-style:italic}
 main{width:min(1050px,94%);margin:0 auto;padding:18px 0 30px;flex:1}
 .controls{
   display:flex;justify-content:center;align-items:flex-end;gap:22px;flex-wrap:wrap;
@@ -61,7 +61,7 @@ input:disabled,select:disabled,button:disabled{opacity:.5;cursor:default}
 .side .field{display:flex;flex-direction:column;gap:7px}
 .side label{font-size:.82rem}
 .timer-value{font-size:1.65rem;font-weight:bold;text-align:center;color:var(--blue)}
-.manual-label{display:flex;gap:8px;align-items:center;font-size:.85rem}
+.mode-buttons{display:flex;flex-direction:column;gap:8px}.mode-btn{padding:9px 10px;border:1px solid var(--blue);border-radius:8px;background:white;color:var(--blue);font-weight:600}.mode-btn.active{background:var(--blue);color:white}.manual-label{display:flex;gap:8px;align-items:center;font-size:.85rem}
 #action{
   display:block;margin:22px auto 0;min-width:150px;
   background:var(--blue);color:white;border-color:var(--blue);font-weight:bold;
@@ -90,12 +90,12 @@ footer{text-align:center;padding:18px;color:#687681;font-size:.8rem}
       <label>Choisir une série</label>
       <div>
         <button id="randomBtn" type="button" class="active">Au hasard</button>
-        <button id="numberBtn" type="button">Par numéro</button>
-        <input id="numberInput" type="number" min="1" max="30" value="1" disabled aria-label="Numéro de série">
+        <span style="margin-left:8px;">Par numéro</span>
+        <input id="numberInput" type="number" min="1" max="30" placeholder="1" aria-label="Numéro de série">
       </div>
     </div>
     <div class="control-group">
-      <label>Choisir un niveau</label>
+      <label>Niveau de difficulté</label>
       <select id="difficulty">
         <option value="random">—</option>
         <option value="1">1 – Facile</option>
@@ -111,16 +111,16 @@ footer{text-align:center;padding:18px;color:#687681;font-size:.8rem}
     </section>
 
     <aside class="side">
-      <h2>Réglages</h2>
-      <div class="field">
-        <label for="duration">Timer</label>
+      <h2>Mode d’affichage</h2>
+      <div class="mode-buttons">
+        <button id="timerMode" type="button" class="mode-btn active">Timer</button>
+        <button id="manualMode" type="button" class="mode-btn">Mode manuel</button>
+      </div>
+      <div class="field" id="timerSettings">
+        <label for="duration">Durée</label>
         <input id="duration" type="range" min="1" max="5" value="3">
         <div class="timer-value"><span id="durationValue">3</span> s</div>
       </div>
-      <label class="manual-label">
-        <input id="manual" type="checkbox">
-        Mode manuel
-      </label>
     </aside>
   </div>
 
@@ -136,72 +136,97 @@ const message=document.getElementById("message");
 const action=document.getElementById("action");
 const status=document.getElementById("status");
 const randomBtn=document.getElementById("randomBtn");
-const numberBtn=document.getElementById("numberBtn");
 const numberInput=document.getElementById("numberInput");
 const difficulty=document.getElementById("difficulty");
 const duration=document.getElementById("duration");
 const durationValue=document.getElementById("durationValue");
-const manual=document.getElementById("manual");
+const timerMode=document.getElementById("timerMode");
+const manualMode=document.getElementById("manualMode");
+const timerSettings=document.getElementById("timerSettings");
 
 let current=null, phase="ready", index=0, timerId=null, countdownId=null, chronoStart=0, chronoId=null;
-let selectedMode="random";
+let displayMode="timer";
 
 duration.addEventListener("input",()=>durationValue.textContent=duration.value);
 
 randomBtn.onclick=()=>{
-  selectedMode="random"; randomBtn.classList.add("active"); numberBtn.classList.remove("active");
-  numberInput.disabled=true; difficulty.value="random"; reset();
-};
-numberBtn.onclick=()=>{
-  selectedMode="number"; numberBtn.classList.add("active"); randomBtn.classList.remove("active");
-  numberInput.disabled=false; difficulty.value="random"; reset();
-};
-difficulty.onchange=()=>{
-  if(difficulty.value!=="random"){
-    selectedMode="difficulty"; randomBtn.classList.remove("active"); numberBtn.classList.remove("active");
-    numberInput.disabled=true;
-  } else if(selectedMode==="difficulty"){
-    selectedMode="random"; randomBtn.classList.add("active"); numberBtn.classList.remove("active");
-  }
+  numberInput.value="";
+  difficulty.value="random";
   reset();
 };
-duration.onchange=reset;
-manual.onchange=reset;
-numberInput.onchange=()=>{
-  let n=Math.max(1,Math.min(30,Number(numberInput.value)||1));
-  numberInput.value=n; reset();
+
+numberInput.oninput=()=>{
+  if(numberInput.value!==""){
+    difficulty.value="random";
+    reset();
+  }
 };
+
+difficulty.onchange=()=>reset();
+
+timerMode.onclick=()=>{
+  displayMode="timer";
+  timerMode.classList.add("active");
+  manualMode.classList.remove("active");
+  timerSettings.style.display="";
+  reset();
+};
+
+manualMode.onclick=()=>{
+  displayMode="manual";
+  manualMode.classList.add("active");
+  timerMode.classList.remove("active");
+  timerSettings.style.display="none";
+  reset();
+};
+
+duration.onchange=reset;
 
 function clearTimers(){
   if(timerId!==null){clearTimeout(timerId);timerId=null}
   if(countdownId!==null){clearInterval(countdownId);countdownId=null}
   if(chronoId!==null){clearInterval(chronoId);chronoId=null}
 }
+
 function reset(){
-  clearTimers(); current=null; phase="ready"; index=0;
-  message.className=""; message.innerHTML="Prêt·e·s ?<br>Concentré·e·s ?<br>C’est parti.";
+  clearTimers();
+  current=null; phase="ready"; index=0;
+  message.style.fontSize="";
+  message.className="";
+  message.innerHTML="Prêt·e·s ?<br>Concentré·e·s ?<br>C’est parti.";
   status.textContent="";
-  action.textContent="Démarrer"; action.classList.remove("secondary");
+  action.textContent="Démarrer";
+  action.classList.remove("secondary");
 }
+
 function chooseSeries(){
-  if(selectedMode==="number") return SERIES[numberInput.value-1];
-  if(selectedMode==="difficulty"){
-    const pool=SERIES.filter(s=>s.level===Number(difficulty.value));
+  const n=Number(numberInput.value);
+  if(n>=1 && n<=30) return SERIES[n-1];
+
+  if(difficulty.value!=="random"){
+    const level=Number(difficulty.value);
+    const pool=SERIES.filter(s=>s.level===level);
     return pool[Math.floor(Math.random()*pool.length)];
   }
+
   return SERIES[Math.floor(Math.random()*SERIES.length)];
 }
+
 function setText(text,level=null){
   message.className=level ? "level-"+level : "";
   message.textContent=text;
 }
+
 function startSeries(){
-  current=chooseSeries(); index=0; phase="phrase"; status.textContent="Série "+current.id+" · niveau "+current.level;
-  action.textContent="Arrêter";
-  showPhrase();
+  current=chooseSeries();
+  index=0;
+  phase="waiting-first";
+  status.textContent="Série "+current.id+" · niveau "+current.level;
+  action.textContent="Démarrer";
+  setText("Prêt·e·s ?\nConcentré·e·s ?\nC’est parti.");
 }
-function showPhrase(){
-  clearTimers();
+
+function startNextPhrase(){
   if(index<5){
     phase="phrase";
     setText(current.phrases[index],current.level);
@@ -210,16 +235,19 @@ function showPhrase(){
     phase="bonus-intro";
     setText("Bonus !");
     action.textContent="Démarrer";
-    action.classList.remove("secondary");
-    status.textContent="La sixième phrase est le bonus.";
+    status.textContent="Les cinq phrases sont terminées.";
   }
 }
+
 function runDisplay(){
+  clearTimers();
   action.textContent="Arrêter";
-  if(manual.checked){
+
+  if(displayMode==="manual"){
     chronoStart=Date.now();
+    status.textContent="Visible depuis 0,0 s";
     chronoId=setInterval(()=>{
-      const seconds=((Date.now()-chronoStart)/1000).toFixed(1);
+      const seconds=((Date.now()-chronoStart)/1000).toFixed(1).replace(".",",");
       status.textContent="Visible depuis "+seconds+" s";
     },100);
   } else {
@@ -232,16 +260,19 @@ function runDisplay(){
     timerId=setTimeout(()=>finishDisplay(),Number(duration.value)*1000);
   }
 }
+
 function finishDisplay(){
   clearTimers();
+
   if(phase==="phrase"){
     index++;
+    phase="waiting-next";
     setText("Écrivez");
     action.textContent="Démarrer";
-    if(index<5) status.textContent="Phrase "+index+" / 5 terminée.";
-    else status.textContent="Les cinq phrases sont terminées.";
+    status.textContent=index<5 ? "Phrase "+index+" / 5 terminée." : "Les cinq phrases sont terminées.";
     return;
   }
+
   if(phase==="bonus"){
     phase="correction";
     index=0;
@@ -251,11 +282,13 @@ function finishDisplay(){
     status.textContent="Cliquez pour révéler les phrases dans l’ordre.";
   }
 }
+
 function showBonus(){
   phase="bonus";
   setText(current.bonus.reduced,current.level);
   runDisplay();
 }
+
 function showCorrection(){
   if(index<5){
     setText(current.phrases[index],current.level);
@@ -275,8 +308,8 @@ function showCorrection(){
     index++;
     return;
   }
-  let all=current.phrases.map((p,i)=>(i+1)+". "+p).join("\n");
-  all+="\n\nBonus : "+current.bonus.full;
+
+  const all=current.phrases.map((p,i)=>(i+1)+". "+p).join("\n")+"\n\nBonus : "+current.bonus.full;
   setText(all,current.level);
   message.style.fontSize="1.15rem";
   status.textContent="Série terminée.";
@@ -284,16 +317,31 @@ function showCorrection(){
   action.classList.remove("secondary");
   phase="done";
 }
+
 action.onclick=()=>{
-  if(phase==="ready"){startSeries();return}
-  if(phase==="phrase" || phase==="bonus"){
-    if(manual.checked || !timerId) finishDisplay();
-    else finishDisplay();
+  if(phase==="ready"){
+    startSeries();
     return;
   }
-  if(phase==="bonus-intro"){showBonus();return}
-  if(phase==="correction"){showCorrection();return}
-  if(phase==="done"){message.style.fontSize="";reset();return}
+  if(phase==="waiting-first" || phase==="waiting-next"){
+    startNextPhrase();
+    return;
+  }
+  if(phase==="phrase" || phase==="bonus"){
+    finishDisplay();
+    return;
+  }
+  if(phase==="bonus-intro"){
+    showBonus();
+    return;
+  }
+  if(phase==="correction"){
+    showCorrection();
+    return;
+  }
+  if(phase==="done"){
+    reset();
+  }
 };
 </script>
 </body>
