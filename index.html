@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fluañs – améliorer sa vitesse de lecture</title>
+<style>
+:root{
+  --blue:#244f73;
+  --blue-dark:#183b58;
+  --blue-light:#eef5f9;
+  --border:#c9d8e3;
+  --text:#24313b;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Verdana, Geneva, sans-serif;
+  color:var(--text);
+  background:#f8fafb;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+header{text-align:center;padding:28px 20px 12px}
+h1{margin:0;color:var(--blue);font-size:2.15rem;letter-spacing:.02em}
+.subtitle{margin:6px 0 0;font-size:1rem;color:#5b6b77}
+main{width:min(1050px,94%);margin:0 auto;padding:18px 0 30px;flex:1}
+.controls{
+  display:flex;justify-content:center;align-items:flex-end;gap:22px;flex-wrap:wrap;
+  margin-bottom:20px;
+}
+.control-group{display:flex;flex-direction:column;gap:6px}
+.control-group label{font-size:.88rem;color:#50616d}
+button,select,input{
+  font:inherit;border:1px solid var(--border);border-radius:7px;
+  background:white;color:var(--text);padding:9px 12px;
+}
+button{cursor:pointer}
+button:hover{background:var(--blue-light)}
+button.active{background:var(--blue);color:white;border-color:var(--blue)}
+input[type=number]{width:88px}
+input:disabled,select:disabled,button:disabled{opacity:.5;cursor:default}
+.stage{
+  display:grid;grid-template-columns:minmax(0,1fr) 155px;gap:18px;align-items:stretch;
+}
+.display{
+  min-height:310px;background:white;border:1px solid var(--border);border-radius:12px;
+  display:flex;align-items:center;justify-content:center;text-align:center;padding:30px;
+  box-shadow:0 3px 12px rgba(30,60,80,.07);
+}
+#message{font-size:2.25rem;line-height:1.35;max-width:100%;white-space:pre-line}
+.level-1{color:#285c43}
+.level-2{color:#805327}
+.level-3{color:#8b3030}
+.side{
+  background:var(--blue-light);border:1px solid var(--border);border-radius:12px;
+  padding:18px 15px;display:flex;flex-direction:column;gap:16px;
+}
+.side h2{font-size:1rem;color:var(--blue);margin:0}
+.side .field{display:flex;flex-direction:column;gap:7px}
+.side label{font-size:.82rem}
+.timer-value{font-size:1.65rem;font-weight:bold;text-align:center;color:var(--blue)}
+.manual-label{display:flex;gap:8px;align-items:center;font-size:.85rem}
+#action{
+  display:block;margin:22px auto 0;min-width:150px;
+  background:var(--blue);color:white;border-color:var(--blue);font-weight:bold;
+}
+#action:hover{background:var(--blue-dark)}
+#action.secondary{background:white;color:var(--blue)}
+.status{text-align:center;min-height:28px;margin:14px 0 0;color:#5a6974;font-size:.92rem}
+footer{text-align:center;padding:18px;color:#687681;font-size:.8rem}
+@media(max-width:700px){
+  .stage{grid-template-columns:1fr}
+  .side{display:grid;grid-template-columns:1fr 1fr;align-items:center}
+  .side h2{grid-column:1/-1}
+  #message{font-size:1.65rem}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Fluañs</h1>
+  <p class="subtitle">améliorer sa vitesse de lecture</p>
+</header>
+
+<main>
+  <div class="controls">
+    <div class="control-group">
+      <label>Choisir une série</label>
+      <div>
+        <button id="randomBtn" type="button" class="active">Au hasard</button>
+        <button id="numberBtn" type="button">Par numéro</button>
+        <input id="numberInput" type="number" min="1" max="30" value="1" disabled aria-label="Numéro de série">
+      </div>
+    </div>
+    <div class="control-group">
+      <label>Choisir un niveau</label>
+      <select id="difficulty">
+        <option value="random">—</option>
+        <option value="1">1 – Facile</option>
+        <option value="2">2 – Intermédiaire</option>
+        <option value="3">3 – Difficile</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="stage">
+    <section class="display" aria-live="polite">
+      <div id="message">Prêt·e·s ?<br>Concentré·e·s ?<br>C’est parti.</div>
+    </section>
+
+    <aside class="side">
+      <h2>Réglages</h2>
+      <div class="field">
+        <label for="duration">Timer</label>
+        <input id="duration" type="range" min="1" max="5" value="3">
+        <div class="timer-value"><span id="durationValue">3</span> s</div>
+      </div>
+      <label class="manual-label">
+        <input id="manual" type="checkbox">
+        Mode manuel
+      </label>
+    </aside>
+  </div>
+
+  <button id="action" type="button">Démarrer</button>
+  <div id="status" class="status"></div>
+</main>
+
+<footer>© Fluañs – Pierre Lemétayer – 2026</footer>
+
+<script src="series.js"></script>
+<script>
+const message=document.getElementById("message");
+const action=document.getElementById("action");
+const status=document.getElementById("status");
+const randomBtn=document.getElementById("randomBtn");
+const numberBtn=document.getElementById("numberBtn");
+const numberInput=document.getElementById("numberInput");
+const difficulty=document.getElementById("difficulty");
+const duration=document.getElementById("duration");
+const durationValue=document.getElementById("durationValue");
+const manual=document.getElementById("manual");
+
+let current=null, phase="ready", index=0, timerId=null, countdownId=null, chronoStart=0, chronoId=null;
+let selectedMode="random";
+
+duration.addEventListener("input",()=>durationValue.textContent=duration.value);
+
+randomBtn.onclick=()=>{
+  selectedMode="random"; randomBtn.classList.add("active"); numberBtn.classList.remove("active");
+  numberInput.disabled=true; difficulty.value="random"; reset();
+};
+numberBtn.onclick=()=>{
+  selectedMode="number"; numberBtn.classList.add("active"); randomBtn.classList.remove("active");
+  numberInput.disabled=false; difficulty.value="random"; reset();
+};
+difficulty.onchange=()=>{
+  if(difficulty.value!=="random"){
+    selectedMode="difficulty"; randomBtn.classList.remove("active"); numberBtn.classList.remove("active");
+    numberInput.disabled=true;
+  } else if(selectedMode==="difficulty"){
+    selectedMode="random"; randomBtn.classList.add("active"); numberBtn.classList.remove("active");
+  }
+  reset();
+};
+duration.onchange=reset;
+manual.onchange=reset;
+numberInput.onchange=()=>{
+  let n=Math.max(1,Math.min(30,Number(numberInput.value)||1));
+  numberInput.value=n; reset();
+};
+
+function clearTimers(){
+  if(timerId!==null){clearTimeout(timerId);timerId=null}
+  if(countdownId!==null){clearInterval(countdownId);countdownId=null}
+  if(chronoId!==null){clearInterval(chronoId);chronoId=null}
+}
+function reset(){
+  clearTimers(); current=null; phase="ready"; index=0;
+  message.className=""; message.innerHTML="Prêt·e·s ?<br>Concentré·e·s ?<br>C’est parti.";
+  status.textContent="";
+  action.textContent="Démarrer"; action.classList.remove("secondary");
+}
+function chooseSeries(){
+  if(selectedMode==="number") return SERIES[numberInput.value-1];
+  if(selectedMode==="difficulty"){
+    const pool=SERIES.filter(s=>s.level===Number(difficulty.value));
+    return pool[Math.floor(Math.random()*pool.length)];
+  }
+  return SERIES[Math.floor(Math.random()*SERIES.length)];
+}
+function setText(text,level=null){
+  message.className=level ? "level-"+level : "";
+  message.textContent=text;
+}
+function startSeries(){
+  current=chooseSeries(); index=0; phase="phrase"; status.textContent="Série "+current.id+" · niveau "+current.level;
+  action.textContent="Arrêter";
+  showPhrase();
+}
+function showPhrase(){
+  clearTimers();
+  if(index<5){
+    phase="phrase";
+    setText(current.phrases[index],current.level);
+    runDisplay();
+  } else {
+    phase="bonus-intro";
+    setText("Bonus !");
+    action.textContent="Démarrer";
+    action.classList.remove("secondary");
+    status.textContent="La sixième phrase est le bonus.";
+  }
+}
+function runDisplay(){
+  action.textContent="Arrêter";
+  if(manual.checked){
+    chronoStart=Date.now();
+    chronoId=setInterval(()=>{
+      const seconds=((Date.now()-chronoStart)/1000).toFixed(1);
+      status.textContent="Visible depuis "+seconds+" s";
+    },100);
+  } else {
+    let remaining=Number(duration.value);
+    status.textContent="Visible · "+remaining+" s";
+    countdownId=setInterval(()=>{
+      remaining--;
+      if(remaining>0) status.textContent="Visible · "+remaining+" s";
+    },1000);
+    timerId=setTimeout(()=>finishDisplay(),Number(duration.value)*1000);
+  }
+}
+function finishDisplay(){
+  clearTimers();
+  if(phase==="phrase"){
+    index++;
+    setText("Écrivez");
+    action.textContent="Démarrer";
+    if(index<5) status.textContent="Phrase "+index+" / 5 terminée.";
+    else status.textContent="Les cinq phrases sont terminées.";
+    return;
+  }
+  if(phase==="bonus"){
+    phase="correction";
+    index=0;
+    setText("Correction");
+    action.textContent="Correction";
+    action.classList.add("secondary");
+    status.textContent="Cliquez pour révéler les phrases dans l’ordre.";
+  }
+}
+function showBonus(){
+  phase="bonus";
+  setText(current.bonus.reduced,current.level);
+  runDisplay();
+}
+function showCorrection(){
+  if(index<5){
+    setText(current.phrases[index],current.level);
+    status.textContent="Correction · phrase "+(index+1)+" / 5";
+    index++;
+    return;
+  }
+  if(index===5){
+    setText(current.bonus.reduced,current.level);
+    status.textContent="Correction · bonus réduit";
+    index++;
+    return;
+  }
+  if(index===6){
+    setText(current.bonus.full,current.level);
+    status.textContent="Correction · bonus complet";
+    index++;
+    return;
+  }
+  let all=current.phrases.map((p,i)=>(i+1)+". "+p).join("\n");
+  all+="\n\nBonus : "+current.bonus.full;
+  setText(all,current.level);
+  message.style.fontSize="1.15rem";
+  status.textContent="Série terminée.";
+  action.textContent="Recommencer";
+  action.classList.remove("secondary");
+  phase="done";
+}
+action.onclick=()=>{
+  if(phase==="ready"){startSeries();return}
+  if(phase==="phrase" || phase==="bonus"){
+    if(manual.checked || !timerId) finishDisplay();
+    else finishDisplay();
+    return;
+  }
+  if(phase==="bonus-intro"){showBonus();return}
+  if(phase==="correction"){showCorrection();return}
+  if(phase==="done"){message.style.fontSize="";reset();return}
+};
+</script>
+</body>
+</html>
