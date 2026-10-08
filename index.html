@@ -50,9 +50,9 @@ input:disabled,select:disabled,button:disabled{opacity:.5;cursor:default}
   box-shadow:0 3px 12px rgba(30,60,80,.07);
 }
 #message{font-size:2.25rem;line-height:1.35;max-width:100%;white-space:pre-line}
-.level-1{color:#285c43}
-.level-2{color:#805327}
-.level-3{color:#8b3030}
+.level-1{color:#b0d2ba}
+.level-2{color:#cbb096}
+.level-3{color:#e1aaaa}
 .side{
   background:var(--blue-light);border:1px solid var(--border);border-radius:12px;
   padding:18px 15px;display:flex;flex-direction:column;gap:16px;
@@ -107,7 +107,7 @@ footer{text-align:center;padding:18px;color:#687681;font-size:.8rem}
 
   <div class="stage">
     <section class="display" aria-live="polite">
-      <div id="message">Prêt·e·s ?<br>Concentré·e·s ?<br>C’est parti.</div>
+      <div id="message"></div>
     </section>
 
     <aside class="side">
@@ -236,7 +236,13 @@ function startNextPhrase(){
     runDisplay();
   } else {
     phase="bonus-intro";
-    setText("Bonus !");
+    setText("Bonus !\nRemettez les lettres manquantes");
+    message.style.fontSize="1.7rem";
+    const hint=document.createElement("span");
+    hint.style.cssText="display:block;font-size:.85rem;color:#a2a2a2;margin-top:8px;font-weight:400;";
+    hint.textContent="Remettez les lettres manquantes";
+    message.textContent="Bonus !";
+    message.appendChild(hint);
     action.textContent="Démarrer";
     status.textContent=seriesStatus("Les cinq phrases sont terminées.");
   }
