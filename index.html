@@ -53,6 +53,7 @@ input:disabled,select:disabled,button:disabled{opacity:.5;cursor:default}
 .level-1{color:#b0d2ba}
 .level-2{color:#cbb096}
 .level-3{color:#e1aaaa}
+.message-blue{color:var(--blue)}
 .side{
   background:var(--blue-light);border:1px solid var(--border);border-radius:12px;
   padding:18px 15px;display:flex;flex-direction:column;gap:16px;
@@ -227,6 +228,7 @@ function startSeries(){
   status.textContent="Série "+current.id+" · niveau "+current.level;
   action.textContent="Démarrer";
   setText("Prêt·e·s ?\nConcentré·e·s ?\nC’est parti.");
+  message.className="message-blue";
 }
 
 function startNextPhrase(){
@@ -236,7 +238,8 @@ function startNextPhrase(){
     runDisplay();
   } else {
     phase="bonus-intro";
-    setText("Bonus !\nRemettez les lettres manquantes");
+    setText("Bonus !");
+    message.className="message-blue";
     message.style.fontSize="1.7rem";
     const hint=document.createElement("span");
     hint.style.cssText="display:block;font-size:.85rem;color:#a2a2a2;margin-top:8px;font-weight:400;";
@@ -277,6 +280,7 @@ function finishDisplay(){
     index++;
     phase="waiting-next";
     setText("Écrivez");
+    message.className="message-blue";
     action.textContent="Démarrer";
     status.textContent=seriesStatus(index<5 ? "Phrase "+index+" / 5 terminée." : "Les cinq phrases sont terminées.");
     return;
