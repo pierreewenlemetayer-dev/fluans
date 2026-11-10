@@ -79,7 +79,7 @@ footer{text-align:center;padding:18px;color:#687681;font-size:.8rem}\n.about-sec
 }
 .related{display:flex;justify-content:center;padding:0 16px 18px}.related a{display:inline-block;text-align:center;text-decoration:none;color:var(--blue);background:var(--blue-light);border:1px solid var(--border);border-radius:9px;padding:11px 18px;font-weight:600}.related a:hover{background:#dcebf4}
 </style>
-<style>h1 .home-title-link{color:inherit;font:inherit;letter-spacing:inherit;text-decoration:none;cursor:pointer}h1 .home-title-link:hover,h1 .home-title-link:visited,h1 .home-title-link:active{color:inherit;text-decoration:none}h1 .home-title-link:focus-visible{outline:2px solid currentColor;outline-offset:4px}</style></head>
+<style>h1 .home-title-link{color:inherit;font:inherit;letter-spacing:inherit;text-decoration:none;cursor:pointer}h1 .home-title-link:hover,h1 .home-title-link:visited,h1 .home-title-link:active{color:inherit;text-decoration:none}h1 .home-title-link:focus-visible{outline:2px solid currentColor;outline-offset:4px}</style><style id="about-styles">.about-link-wrap{text-align:center;margin:1.4rem 0 .55rem}.about-link{background:none;border:0;padding:.25rem .5rem;color:inherit;opacity:.7;text-decoration:underline;text-underline-offset:3px;font:inherit;font-size:.85rem;cursor:pointer}.about-link:hover,.about-link:focus-visible{opacity:1}.about-dialog{box-sizing:border-box;width:min(760px,calc(100% - 28px));max-height:min(85vh,850px);padding:1.5rem 1.8rem;border:1px solid #bbb;border-radius:12px;background:var(--panel,#fff);color:var(--text,#202631);box-shadow:0 15px 55px #0004}.about-dialog::backdrop{background:#0009}.about-head{display:flex;justify-content:space-between;align-items:start;gap:1rem}.about-head h2{margin:0 0 1.2rem;font-size:1.35rem}.about-close{background:transparent;border:0;color:inherit;font-size:1.8rem;cursor:pointer;line-height:1}.about-content{line-height:1.65;font-size:.97rem}.about-content p{margin:0 0 1rem}</style></head>
 <body>
 <header>
   <h1><a class="home-title-link" href="./" aria-label="Revenir à l’accueil">Prim</a></h1>
@@ -130,13 +130,9 @@ footer{text-align:center;padding:18px;color:#687681;font-size:.8rem}\n.about-sec
 </main>
 
 <nav class="related" aria-label="Autres outils de lecture"><a href="https://pierreewenlemetayer-dev.github.io/fluans-lecture/" target="_blank" rel="noopener noreferrer">Fluañs – Mesurer sa vitesse de lecture</a></nav>
-<footer>
-  <details class="about-section">
-    <summary>À propos</summary>
-    <p>Prim a d'abord été conçu comme une activité brève à mener en classe. Un exercice ludique pour travailler la fluence, la reconnaissance des mots, l'empan visuel. Idéal pour recentrer l'attention, soutenir la concentration, et faire progresser la rapidité de lecture des élèves semaine après semaine. Prim peut aussi être utilisé à la maison, en autonomie.</p>
-  </details>
-  <div>© Prim – Pierre Lemétayer – 2026</div>
-</footer>
+<div class="about-link-wrap"><button type="button" id="about-open" class="about-link">À propos</button></div>
+<dialog id="about-dialog" class="about-dialog" aria-labelledby="about-heading"><div class="about-head"><h2 id="about-heading">À propos de Prim</h2><button type="button" id="about-close" class="about-close" aria-label="Fermer">×</button></div><div class="about-content"><p>Prim a d'abord été conçu comme une activité brève à mener en classe. Un exercice ludique pour travailler la fluence, la reconnaissance des mots, l'empan visuel. Idéal pour recentrer l'attention, soutenir la concentration, et faire progresser la rapidité de lecture des élèves semaine après semaine. Prim peut aussi être utilisé à la maison, en autonomie.</p></div></dialog>
+<footer>© Prim – Pierre Lemétayer – 2026</footer>
 
 <script src="series.js"></script>
 <script>
@@ -365,5 +361,5 @@ action.onclick=()=>{
   }
 };
 </script>
-<script>(function(){const link=document.querySelector('.home-title-link');link.addEventListener('keydown',e=>{if(e.key==='Enter')e.stopImmediatePropagation()},true);link.addEventListener('click',e=>{if(typeof phase!=='undefined'&&phase!=='ready'&&phase!=='done'&&!confirm('Une activité est en cours. Revenir à l’accueil et abandonner la progression ?'))e.preventDefault()})})();</script><script id="leave-guard">(function(){'use strict';const active=()=>{try{return typeof window.__homeActivityActive==='function'?!!window.__homeActivityActive():!!(typeof phase!=='undefined'&&phase!=='ready'&&phase!=='done')}catch(_){return false}};let leavingByTitle=false;const title=document.querySelector('h1 a.home-title-link, h1 a#home');if(title){title.addEventListener('click',e=>{if(e.defaultPrevented)return;if(active()){leavingByTitle=true;setTimeout(()=>{leavingByTitle=false},1000)} });}window.addEventListener('beforeunload',e=>{if(!leavingByTitle&&active()){e.preventDefault();e.returnValue=''}})})();</script></body>
+<script>(function(){const link=document.querySelector('.home-title-link');link.addEventListener('keydown',e=>{if(e.key==='Enter')e.stopImmediatePropagation()},true);link.addEventListener('click',e=>{if(typeof phase!=='undefined'&&phase!=='ready'&&phase!=='done'&&!confirm('Une activité est en cours. Revenir à l’accueil et abandonner la progression ?'))e.preventDefault()})})();</script><script id="leave-guard">(function(){'use strict';const active=()=>{try{return typeof window.__homeActivityActive==='function'?!!window.__homeActivityActive():!!(typeof phase!=='undefined'&&phase!=='ready'&&phase!=='done')}catch(_){return false}};let leavingByTitle=false;const title=document.querySelector('h1 a.home-title-link, h1 a#home');if(title){title.addEventListener('click',e=>{if(e.defaultPrevented)return;if(active()){leavingByTitle=true;setTimeout(()=>{leavingByTitle=false},1000)} });}window.addEventListener('beforeunload',e=>{if(!leavingByTitle&&active()){e.preventDefault();e.returnValue=''}})})();</script><script id="about-script">(function(){const dialog=document.getElementById('about-dialog');document.getElementById('about-open').addEventListener('click',()=>dialog.showModal());document.getElementById('about-close').addEventListener('click',()=>dialog.close());dialog.addEventListener('click',e=>{if(e.target===dialog)dialog.close()})})();</script></body>
 </html>
