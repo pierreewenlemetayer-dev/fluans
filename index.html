@@ -70,7 +70,7 @@ input:disabled,select:disabled,button:disabled{opacity:.5;cursor:default}
 #action:hover{background:var(--blue-dark)}
 #action.secondary{background:white;color:var(--blue)}
 .status{text-align:center;min-height:28px;margin:14px 0 0;color:#5a6974;font-size:.92rem}
-footer{text-align:center;padding:18px;color:#687681;font-size:.8rem}
+footer{text-align:center;padding:18px;color:#687681;font-size:.8rem}\n.about-section{max-width:680px;margin:0 auto 14px;text-align:center}\n.about-section summary{display:inline-block;cursor:pointer;color:#687681;font-size:.8rem;list-style:none}\n.about-section summary::-webkit-details-marker{display:none}\n.about-section summary:hover{text-decoration:underline}\n.about-section summary:focus-visible{outline:2px solid var(--blue);outline-offset:3px}\n.about-section p{font-size:.9rem;line-height:1.65;text-align:left;margin:14px 12px 0;color:#50616d}
 @media(max-width:700px){
   .stage{grid-template-columns:1fr}
   .side{display:grid;grid-template-columns:1fr 1fr;align-items:center}
@@ -130,7 +130,13 @@ footer{text-align:center;padding:18px;color:#687681;font-size:.8rem}
 </main>
 
 <nav class="related" aria-label="Autres outils de lecture"><a href="https://pierreewenlemetayer-dev.github.io/fluans-lecture/" target="_blank" rel="noopener noreferrer">Fluañs – Mesurer sa vitesse de lecture</a></nav>
-<footer>© Prim – Pierre Lemétayer – 2026</footer>
+<footer>
+  <details class="about-section">
+    <summary>À propos</summary>
+    <p>Prim a d'abord été conçu comme une activité brève à mener en classe. Un exercice ludique pour travailler la fluence, la reconnaissance des mots, l'empan visuel. Idéal pour recentrer l'attention, soutenir la concentration, et faire progresser la rapidité de lecture des élèves semaine après semaine. Prim peut aussi être utilisé à la maison, en autonomie.</p>
+  </details>
+  <div>© Prim – Pierre Lemétayer – 2026</div>
+</footer>
 
 <script src="series.js"></script>
 <script>
